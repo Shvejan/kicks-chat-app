@@ -1,8 +1,55 @@
-{% extends 'layout.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kicks!</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script
+              src="http://code.jquery.com/jquery-3.2.1.min.js"
+              integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+              crossorigin="anonymous"></script>
 
-{% block title %} Home {% endblock %}
 
-{% block body %}
 
-    index
-{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            var ps=io("http://127.0.0.1:5000/private")
+
+            var person = prompt("Please enter your name:");
+            if (person == null || person == "")
+            {
+              document.querySelector("#welcome").innerHTML="enter valid username"
+            }
+            else
+            {
+              document.querySelector("#welcome").innerHTML= "Welcomoe "+person
+              ps.emit('uname',person)
+              console.log('new user sent')
+            }
+            ps.on("online_users",function(l)
+            {
+              document.querySelector("#online_users").innerHTML+= l
+              console.log("list recieved")
+              console.log(l)
+
+            })
+
+          });
+    </script>
+
+</head>
+<body>
+    <h1 id="welcome"></h1>
+
+
+    <h3>online users</h3>
+    <ul id="online_users">
+      {% for u,s in users.items() %}
+        <li>{{  u  }}</li>
+      {% endfor %}
+    </ul>
+
+
+
+</body>
+</html>

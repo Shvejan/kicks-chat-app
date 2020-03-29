@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+      const socket = io.connect("http://127.0.0.1:5000/");
+
+      socket.on('connect', function () {
+          socket.emit('join', {
+              username: "{{ u }}",
+              room: "{{ r }}"
+            })
+
+              document.getElementById('send').onsubmit = function (e) {
+                e.preventDefault();
+                let text = document.querySelector('#text').value.trim()
+                if(text.length){
+                  console.log("enteres")
+                  socket.emit("send_text",{
+                    username: "{{ u }}",
+                    room: "{{ r }}",
+                    text: text,
+                  })
+                }
+                document.querySelector('#text').value="";
+                document.querySelector('#text').focus();
+          }
+        });
+
+
+        socket.on('recieve_msg',function(data){
+          console.log(data)
+          const msg = document.createElement('div')
+          msg.innerHTML = `<b>${data.username}: </b> ${data.text} `;
+          document.getElementById('messages').appendChild(msg);
+
+        });
+
+
+        socket.on('join_anouncement', function (data) {
+
+            console.log(data)
+            const msg = document.createElement('div')
+            msg.innerHTML = `<b>${data.username}</b> has joined the room`;
+            document.getElementById('messages').appendChild(msg);
+        });
+
+
+    </script>
+    <meta charset="utf-8">
+    <title></title>
+
+  </head>
+  <body>
+    <h1>Welcome {{ u }} to the room {{ r }}</h1>
+    <form action="{{ url_for('logout') }}" method="get">
+        <button type="submit" name="button">Logout</button>
+    </form>
+    <div id="messages">
+      <br><br>
+      <form id="send">
+          <input type="text" id ="text" placeholder="Enter message" name="" value="">
+          <button type="submit" name="button">send</button>
+      </form>
+      <br><br><br>
+
+    </div>
+  </body>
+</html>
